@@ -1,4 +1,6 @@
-﻿namespace ICS_Viewer_C_
+﻿using System.Windows.Forms;
+
+namespace ICS_Viewer_C_
 {
     partial class Form1
     {
@@ -29,62 +31,73 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-            this.DTStart = new System.Windows.Forms.RichTextBox();
-            this.DTEnd = new System.Windows.Forms.RichTextBox();
-            this.Location = new System.Windows.Forms.RichTextBox();
-            this.Summary = new System.Windows.Forms.RichTextBox();
-            this.Description = new System.Windows.Forms.RichTextBox();
+            this.DTStart = new System.Windows.Forms.TextBox();
+            this.DTEnd = new System.Windows.Forms.TextBox();
+            this.MeetingLocation = new System.Windows.Forms.TextBox();
+            this.Summary = new System.Windows.Forms.TextBox();
+            this.Description = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // DTStart
             // 
+            this.DTStart.BackColor = System.Drawing.SystemColors.Window;
+            this.DTStart.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.DTStart.Location = new System.Drawing.Point(12, 12);
             this.DTStart.Name = "DTStart";
-            this.DTStart.Size = new System.Drawing.Size(510, 32);
+            this.DTStart.ReadOnly = true;
+            this.DTStart.Size = new System.Drawing.Size(510, 20);
             this.DTStart.TabIndex = 0;
-            this.DTStart.Text = "";
             // 
             // DTEnd
             // 
-            this.DTEnd.Location = new System.Drawing.Point(12, 50);
+            this.DTEnd.BackColor = System.Drawing.SystemColors.Window;
+            this.DTEnd.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.DTEnd.Location = new System.Drawing.Point(12, 38);
             this.DTEnd.Name = "DTEnd";
-            this.DTEnd.Size = new System.Drawing.Size(510, 32);
+            this.DTEnd.ReadOnly = true;
+            this.DTEnd.Size = new System.Drawing.Size(510, 20);
             this.DTEnd.TabIndex = 1;
-            this.DTEnd.Text = "";
             // 
-            // Location
+            // MeetingLocation
             // 
-            this.Location.Location = new System.Drawing.Point(12, 88);
-            this.Location.Name = "Location";
-            this.Location.Size = new System.Drawing.Size(510, 32);
-            this.Location.TabIndex = 2;
-            this.Location.Text = "";
+            this.MeetingLocation.BackColor = System.Drawing.SystemColors.Window;
+            this.MeetingLocation.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.MeetingLocation.Location = new System.Drawing.Point(12, 64);
+            this.MeetingLocation.Name = "MeetingLocation";
+            this.MeetingLocation.ReadOnly = true;
+            this.MeetingLocation.Size = new System.Drawing.Size(510, 20);
+            this.MeetingLocation.TabIndex = 2;
             // 
             // Summary
             // 
-            this.Summary.Location = new System.Drawing.Point(12, 126);
+            this.Summary.BackColor = System.Drawing.SystemColors.Window;
+            this.Summary.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.Summary.Location = new System.Drawing.Point(12, 90);
             this.Summary.Name = "Summary";
-            this.Summary.Size = new System.Drawing.Size(510, 32);
+            this.Summary.ReadOnly = true;
+            this.Summary.Size = new System.Drawing.Size(510, 20);
             this.Summary.TabIndex = 3;
-            this.Summary.Text = "";
             // 
             // Description
             // 
-            this.Description.Location = new System.Drawing.Point(12, 164);
+            this.Description.BackColor = System.Drawing.SystemColors.Window;
+            this.Description.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.Description.Location = new System.Drawing.Point(12, 116);
+            this.Description.Multiline = true;
             this.Description.Name = "Description";
-            this.Description.Size = new System.Drawing.Size(510, 232);
+            this.Description.ReadOnly = true;
+            this.Description.Size = new System.Drawing.Size(510, 280);
             this.Description.TabIndex = 4;
-            this.Description.Text = "";
-            this.Description.TextChanged += new System.EventHandler(this.Description_TextChanged);
             // 
             // label1
             // 
             this.label1.Location = new System.Drawing.Point(12, 399);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(510, 53);
+            this.label1.Size = new System.Drawing.Size(510, 43);
             this.label1.TabIndex = 5;
-            this.label1.Text = resources.GetString("label1.Text");
+            this.label1.Text = "To open a file, simply drag it into this window.\r\nWill only display the first eve" +
+    "nt of a file containing multiple events.\r\nDate format is DD.MM.YYYY.";
             this.label1.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             // 
             // Form1
@@ -92,27 +105,32 @@
             this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(534, 461);
+            this.ClientSize = new System.Drawing.Size(534, 443);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.Description);
             this.Controls.Add(this.Summary);
-            this.Controls.Add(this.Location);
+            this.Controls.Add(this.MeetingLocation);
             this.Controls.Add(this.DTEnd);
             this.Controls.Add(this.DTStart);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.MaximizeBox = false;
             this.Name = "Form1";
             this.Text = "Tiny ICS Viewer";
+            this.DragDrop += new System.Windows.Forms.DragEventHandler(this.Form1_DragDrop);
+            this.DragEnter += new System.Windows.Forms.DragEventHandler(this.Form1_DragEnter);
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
         #endregion
 
-        private System.Windows.Forms.RichTextBox DTStart;
-        private System.Windows.Forms.RichTextBox DTEnd;
-        private System.Windows.Forms.RichTextBox Location;
-        private System.Windows.Forms.RichTextBox Summary;
-        private System.Windows.Forms.RichTextBox Description;
+        private System.Windows.Forms.TextBox DTStart;
+        private System.Windows.Forms.TextBox DTEnd;
+        private System.Windows.Forms.TextBox MeetingLocation;
+        private System.Windows.Forms.TextBox Summary;
+        private System.Windows.Forms.TextBox Description;
         private System.Windows.Forms.Label label1;
     }
 }

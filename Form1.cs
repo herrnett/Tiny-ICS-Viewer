@@ -8,122 +8,99 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Windows.Forms.VisualStyles;
+using Ical.Net;
 
 namespace ICS_Viewer_C_
 {
     public partial class Form1 : Form
     {
 
-        string[] texts = { "Begins", "Ends", "Location", "Title", "Description" };
+        string[] texts = { "No beginning", "No end", "No location", "No title", "No description" };
         public Form1()
         {
-
             InitializeComponent();
-            this.FormBorderStyle = FormBorderStyle.FixedSingle;
-            this.MaximizeBox = false;
-            this.AllowDrop = true;
-            this.DragEnter += new DragEventHandler(Form1_DragEnter);
-            this.DragDrop += new DragEventHandler(Form1_DragDrop);
-            DTStart.AllowDrop = true;
-            DTStart.DragEnter += new DragEventHandler(Form1_DragEnter);
-            DTStart.DragDrop += new DragEventHandler(Form1_DragDrop);
+
+            //Fill textboxes
             DTStart.Text = texts[0];
-            DTEnd.AllowDrop = true;
-            DTEnd.DragEnter += new DragEventHandler(Form1_DragEnter);
-            DTEnd.DragDrop += new DragEventHandler(Form1_DragDrop);
             DTEnd.Text = texts[1];
-            Location.AllowDrop = true;
-            Location.DragEnter += new DragEventHandler(Form1_DragEnter);
-            Location.DragDrop += new DragEventHandler(Form1_DragDrop);
-            Location.Text = texts[2];
-            Summary.AllowDrop = true;
-            Summary.DragEnter += new DragEventHandler(Form1_DragEnter);
-            Summary.DragDrop += new DragEventHandler(Form1_DragDrop);
+            MeetingLocation.Text = texts[2];
             Summary.Text = texts[3];
-            Description.AllowDrop = true;
-            Description.DragEnter += new DragEventHandler(Form1_DragEnter);
-            Description.DragDrop += new DragEventHandler(Form1_DragDrop);
             Description.Text = texts[4];
         }
 
         void Form1_DragEnter(object sender, DragEventArgs e)
         {
+            //Check for correct data type while dragging
             if (e.Data.GetDataPresent(DataFormats.FileDrop)) e.Effect = DragDropEffects.Copy;
         }
 
         void Form1_DragDrop(object sender, DragEventArgs e)
         {
+            //Reset textboxes
             DTStart.Text = texts[0];
             DTEnd.Text = texts[1];
-            Location.Text = texts[2];
+            MeetingLocation.Text = texts[2];
             Summary.Text = texts[3];
             Description.Text = texts[4];
 
             string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
             if ( files != null && files.Length > 0 )
             {
-                string readContents;
-                using (StreamReader streamReader = new StreamReader(files[0], Encoding.UTF8))
+                try
                 {
-                    readContents = streamReader.ReadToEnd();
-                    string[] seperators = { "VEVENT","VALARM" };
-                    string[] parts = readContents.Split(seperators, StringSplitOptions.RemoveEmptyEntries);
-                    parts = parts[1].Split('\n');
-
-                    string[] temp;
-                    string year;
-                    string month;
-                    string day;
-                    string hour;
-                    string min;
-                    foreach (string part in parts)
+                    string readContent;
+                    using (StreamReader streamReader = new StreamReader(files[0], Encoding.UTF8))
                     {
-                        if (part.StartsWith("LOCATION"))
+                        readContent = streamReader.ReadToEnd();
+                        var calendar = Calendar.Load(readContent);
+
+                        if (calendar.Events.Count > 0)
                         {
-                            temp = part.Split(':');
-                            Location.Text = "Location: " + temp[1];
+                            foreach (var calendarEvent in calendar.Events)
+                            {
+                                var dtstart = calendarEvent.DtStart;
+                                var dtend = calendarEvent.DtEnd;
+                                string meetinglocation = calendarEvent.Location;
+                                string summary = calendarEvent.Summary;
+                                string description = calendarEvent.Description;
+
+                                if (!string.IsNullOrWhiteSpace(meetinglocation)) 
+                                {
+                                    MeetingLocation.Text = "Location: " + meetinglocation; 
+                                }
+                                if (!string.IsNullOrWhiteSpace(summary))
+                                {
+                                    Summary.Text = "Title: " + summary;
+                                }
+                                if (!string.IsNullOrWhiteSpace(description))
+                                {
+                                    Description.Text = "Description: " + description;
+                                }
+                                if (dtstart != null)
+                                { 
+                                    DTStart.Text = "Begins: " + dtstart.Value.Day.ToString("D2") + "." + dtstart.Value.Month.ToString("D2") + "." + dtstart.Value.Year + " at " + dtstart.Value.Hour + ":" + dtstart.Value.Minute + ". Time zone: " + dtstart.TimeZoneName; 
+                                }
+                                if (dtend != null)
+                                {
+                                    DTEnd.Text = "Ends: " + dtend.Value.Day.ToString("D2") + "." + dtend.Value.Month.ToString("D2") + "." + dtend.Value.Year + " at " + dtend.Value.Hour + ":" + dtend.Value.Minute + ". Time zone: " + dtend.TimeZoneName;
+                                }
+
+                                //Stop after first event for not. TODO: Declare vars earlier, make them lists, iterate through all, implement Buttons to go through all of them.
+                                break;
+                            }
                         }
-                        if (part.StartsWith("SUMMARY"))
+                        else 
                         {
-                            temp = part.Split(':');
-                            Summary.Text = "Title: " + temp[1];
+                            Description.Text = "File does not contain any events!";
                         }
-                        if (part.StartsWith("DESCRIPTION"))
-                        {
-                            seperators = new string[] { "DESCRIPTION:" };
-                            temp = part.Split(seperators, StringSplitOptions.None);
-                            Description.Text = "Description: " + temp[1];
-                        }
-                        if (part.StartsWith("DTSTART"))
-                        {
-                            temp = part.Split(':');
-                            year = temp[1].Substring(0, 4);
-                            month = temp[1].Substring(4, 2);
-                            day = temp[1].Substring(6, 2);
-                            hour = temp[1].Substring(9, 2);
-                            min = temp[1].Substring(11, 2);
-                            temp = temp[0].Split('=');
-                            DTStart.Text = "Begins: " + day + "." + month + "." + year + " um " + hour + ":" + min + ". Time zone: " + temp[1];
-                        }
-                        if (part.StartsWith("DTEND"))
-                        {
-                            temp = part.Split(':');
-                            year = temp[1].Substring(0, 4);
-                            month = temp[1].Substring(4, 2);
-                            day = temp[1].Substring(6, 2);
-                            hour = temp[1].Substring(9, 2);
-                            min = temp[1].Substring(11, 2);
-                            temp = temp[0].Split('=');
-                            DTEnd.Text = "Ends: " + day + "." + month + "." + year + " um " + hour + ":" + min + ". Time Zone: " + temp[1];
-                        }
-                    }   
+                    }
+                }
+                catch (Exception ex) 
+                {
+                    Description.Text = "Not a valid iCalendar file!";
                 }
             }
-        }
-
-        private void Description_TextChanged(object sender, EventArgs e)
-        {
-
         }
     }
 }

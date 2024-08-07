@@ -17,14 +17,12 @@ namespace ICS_Viewer_C_
     public partial class Form1 : Form
     {
 
-        string[] texts = { "No beginning", "No end", "No location", "No title", "No description" };
-
-        // P/Invoke constants
+        //Invoke constants for "About..."
         private const int WM_SYSCOMMAND = 0x112;
         private const int MF_STRING = 0x0;
         private const int MF_SEPARATOR = 0x800;
 
-        // P/Invoke declarations
+        //Invoke declarations for "About..."
         [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         private static extern IntPtr GetSystemMenu(IntPtr hWnd, bool bRevert);
 
@@ -34,9 +32,11 @@ namespace ICS_Viewer_C_
         [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         private static extern bool InsertMenu(IntPtr hMenu, int uPosition, int uFlags, int uIDNewItem, string lpNewItem);
 
-
-        // ID for the About item on the system menu
+        //ID for the "About..." item on the system menu
         private int SYSMENU_ABOUT_ID = 0x1;
+
+        //Textbox presets
+        private string[] texts = { "No beginning", "No end", "No location", "No title", "No description" };
 
         public Form1()
         {
@@ -54,13 +54,11 @@ namespace ICS_Viewer_C_
         {
             base.OnHandleCreated(e);
 
-            // Get a handle to a copy of this form's system (window) menu
+            //Get a handle to a copy of this form's system (window) menu
             IntPtr hSysMenu = GetSystemMenu(this.Handle, false);
 
-            // Add a separator
+            //Add separator and menu item
             AppendMenu(hSysMenu, MF_SEPARATOR, 0, string.Empty);
-
-            // Add the About menu item
             AppendMenu(hSysMenu, MF_STRING, SYSMENU_ABOUT_ID, "&About…");
         }
 
@@ -68,7 +66,7 @@ namespace ICS_Viewer_C_
         {
             base.WndProc(ref m);
 
-            // Test if the About item was selected from the system menu
+            //Test if the "About..." item was selected from the system menu
             if ((m.Msg == WM_SYSCOMMAND) && ((int)m.WParam == SYSMENU_ABOUT_ID))
             {
                 MessageBox.Show("iCal.NET (https://github.com/rianjs/ical.net)\r\n\r\nThis software includes the iCal.NET Library: Copyright (C) 2016 Douglas Day, Rian Stockbower\r\n\r\nPermission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the \"Software\"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:\r\n\r\nThe above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.");

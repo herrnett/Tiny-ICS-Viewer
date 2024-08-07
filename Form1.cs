@@ -5,6 +5,7 @@ using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -17,6 +18,26 @@ namespace ICS_Viewer_C_
     {
 
         string[] texts = { "No beginning", "No end", "No location", "No title", "No description" };
+
+        // P/Invoke constants
+        private const int WM_SYSCOMMAND = 0x112;
+        private const int MF_STRING = 0x0;
+        private const int MF_SEPARATOR = 0x800;
+
+        // P/Invoke declarations
+        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        private static extern IntPtr GetSystemMenu(IntPtr hWnd, bool bRevert);
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        private static extern bool AppendMenu(IntPtr hMenu, int uFlags, int uIDNewItem, string lpNewItem);
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        private static extern bool InsertMenu(IntPtr hMenu, int uPosition, int uFlags, int uIDNewItem, string lpNewItem);
+
+
+        // ID for the About item on the system menu
+        private int SYSMENU_ABOUT_ID = 0x1;
+
         public Form1()
         {
             InitializeComponent();
@@ -27,6 +48,32 @@ namespace ICS_Viewer_C_
             MeetingLocation.Text = texts[2];
             Summary.Text = texts[3];
             Description.Text = texts[4];
+        }
+
+        protected override void OnHandleCreated(EventArgs e)
+        {
+            base.OnHandleCreated(e);
+
+            // Get a handle to a copy of this form's system (window) menu
+            IntPtr hSysMenu = GetSystemMenu(this.Handle, false);
+
+            // Add a separator
+            AppendMenu(hSysMenu, MF_SEPARATOR, 0, string.Empty);
+
+            // Add the About menu item
+            AppendMenu(hSysMenu, MF_STRING, SYSMENU_ABOUT_ID, "&About…");
+        }
+
+        protected override void WndProc(ref Message m)
+        {
+            base.WndProc(ref m);
+
+            // Test if the About item was selected from the system menu
+            if ((m.Msg == WM_SYSCOMMAND) && ((int)m.WParam == SYSMENU_ABOUT_ID))
+            {
+                MessageBox.Show("iCal.NET (https://github.com/rianjs/ical.net)\r\n\r\nThis software includes the iCal.NET Library: Copyright (C) 2016 Douglas Day, Rian Stockbower\r\n\r\nPermission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the \"Software\"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:\r\n\r\nThe above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.");
+            }
+
         }
 
         void Form1_DragEnter(object sender, DragEventArgs e)
@@ -96,7 +143,7 @@ namespace ICS_Viewer_C_
                         }
                     }
                 }
-                catch (Exception ex) 
+                catch 
                 {
                     Description.Text = "Not a valid iCalendar file!";
                 }

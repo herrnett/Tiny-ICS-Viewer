@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Forms.VisualStyles;
 using Ical.Net;
+using static System.Net.WebRequestMethods;
 
 namespace ICS_Viewer_C_
 {
@@ -48,6 +49,14 @@ namespace ICS_Viewer_C_
             MeetingLocation.Text = texts[2];
             Summary.Text = texts[3];
             Description.Text = texts[4];
+
+            //If args, load file
+            string[] args = Environment.GetCommandLineArgs();
+            if (args.Length == 2) 
+            {
+                fillform(args);
+            }
+
         }
 
         protected override void OnHandleCreated(EventArgs e)
@@ -82,6 +91,11 @@ namespace ICS_Viewer_C_
 
         void Form1_DragDrop(object sender, DragEventArgs e)
         {
+            string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+            fillform(files);
+        }
+
+        void fillform(string[] files) {
             //Reset textboxes
             DTStart.Text = texts[0];
             DTEnd.Text = texts[1];
@@ -89,61 +103,64 @@ namespace ICS_Viewer_C_
             Summary.Text = texts[3];
             Description.Text = texts[4];
 
-            string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
-            if ( files != null && files.Length > 0 )
+            if (files != null && files.Length > 0)
             {
-                try
+                for (int i = 0; i < files.Length; i++)
                 {
-                    string readContent;
-                    using (StreamReader streamReader = new StreamReader(files[0], Encoding.UTF8))
+
+                    try
                     {
-                        readContent = streamReader.ReadToEnd();
-                        var calendar = Calendar.Load(readContent);
-
-                        if (calendar.Events.Count > 0)
+                        string readContent;
+                        using (StreamReader streamReader = new StreamReader(files[i], Encoding.UTF8))
                         {
-                            foreach (var calendarEvent in calendar.Events)
+                            readContent = streamReader.ReadToEnd();
+                            var calendar = Calendar.Load(readContent);
+
+                            if (calendar.Events.Count > 0)
                             {
-                                var dtstart = calendarEvent.DtStart;
-                                var dtend = calendarEvent.DtEnd;
-                                string meetinglocation = calendarEvent.Location;
-                                string summary = calendarEvent.Summary;
-                                string description = calendarEvent.Description;
+                                foreach (var calendarEvent in calendar.Events)
+                                {
+                                    var dtstart = calendarEvent.DtStart;
+                                    var dtend = calendarEvent.DtEnd;
+                                    string meetinglocation = calendarEvent.Location;
+                                    string summary = calendarEvent.Summary;
+                                    string description = calendarEvent.Description;
 
-                                if (!string.IsNullOrWhiteSpace(meetinglocation)) 
-                                {
-                                    MeetingLocation.Text = "Location: " + meetinglocation; 
-                                }
-                                if (!string.IsNullOrWhiteSpace(summary))
-                                {
-                                    Summary.Text = "Title: " + summary;
-                                }
-                                if (!string.IsNullOrWhiteSpace(description))
-                                {
-                                    Description.Text = "Description: " + description;
-                                }
-                                if (dtstart != null)
-                                { 
-                                    DTStart.Text = "Begins: " + dtstart.Value.Day.ToString("D2") + "." + dtstart.Value.Month.ToString("D2") + "." + dtstart.Value.Year + " at " + dtstart.Value.Hour.ToString("D2") + ":" + dtstart.Value.Minute.ToString("D2") + ". Time zone: " + dtstart.TimeZoneName; 
-                                }
-                                if (dtend != null)
-                                {
-                                    DTEnd.Text = "Ends: " + dtend.Value.Day.ToString("D2") + "." + dtend.Value.Month.ToString("D2") + "." + dtend.Value.Year + " at " + dtend.Value.Hour.ToString("D2") + ":" + dtend.Value.Minute.ToString("D2") + ". Time zone: " + dtend.TimeZoneName;
-                                }
+                                    if (!string.IsNullOrWhiteSpace(meetinglocation))
+                                    {
+                                        MeetingLocation.Text = "Location: " + meetinglocation;
+                                    }
+                                    if (!string.IsNullOrWhiteSpace(summary))
+                                    {
+                                        Summary.Text = "Title: " + summary;
+                                    }
+                                    if (!string.IsNullOrWhiteSpace(description))
+                                    {
+                                        Description.Text = "Description: " + description;
+                                    }
+                                    if (dtstart != null)
+                                    {
+                                        DTStart.Text = "Begins: " + dtstart.Value.Day.ToString("D2") + "." + dtstart.Value.Month.ToString("D2") + "." + dtstart.Value.Year + " at " + dtstart.Value.Hour.ToString("D2") + ":" + dtstart.Value.Minute.ToString("D2") + ". Time zone: " + dtstart.TimeZoneName;
+                                    }
+                                    if (dtend != null)
+                                    {
+                                        DTEnd.Text = "Ends: " + dtend.Value.Day.ToString("D2") + "." + dtend.Value.Month.ToString("D2") + "." + dtend.Value.Year + " at " + dtend.Value.Hour.ToString("D2") + ":" + dtend.Value.Minute.ToString("D2") + ". Time zone: " + dtend.TimeZoneName;
+                                    }
 
-                                //Stop after first event for not. TODO: Declare vars earlier, make them lists, iterate through all, implement Buttons to go through all of them.
-                                break;
+                                    //Stop after first event for not. TODO: Declare vars earlier, make them lists, iterate through all, implement Buttons to go through all of them.
+                                    break;
+                                }
+                            }
+                            else
+                            {
+                                Description.Text = "File does not contain any events!";
                             }
                         }
-                        else 
-                        {
-                            Description.Text = "File does not contain any events!";
-                        }
                     }
-                }
-                catch 
-                {
-                    Description.Text = "Not a valid iCalendar file!";
+                    catch
+                    {
+                        Description.Text = "Not a valid iCalendar file!";
+                    }
                 }
             }
         }

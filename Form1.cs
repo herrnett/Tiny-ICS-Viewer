@@ -124,11 +124,11 @@ namespace ICS_Viewer_C_
                                 }
                                 if (dtstart != null)
                                 { 
-                                    DTStart.Text = "Begins: " + dtstart.Value.Day.ToString("D2") + "." + dtstart.Value.Month.ToString("D2") + "." + dtstart.Value.Year + " at " + dtstart.Value.Hour + ":" + dtstart.Value.Minute + ". Time zone: " + dtstart.TimeZoneName; 
+                                    DTStart.Text = "Begins: " + dtstart.Value.Day.ToString("D2") + "." + dtstart.Value.Month.ToString("D2") + "." + dtstart.Value.Year + " at " + dtstart.Value.Hour.ToString("D2") + ":" + dtstart.Value.Minute.ToString("D2") + ". Time zone: " + dtstart.TimeZoneName; 
                                 }
                                 if (dtend != null)
                                 {
-                                    DTEnd.Text = "Ends: " + dtend.Value.Day.ToString("D2") + "." + dtend.Value.Month.ToString("D2") + "." + dtend.Value.Year + " at " + dtend.Value.Hour + ":" + dtend.Value.Minute + ". Time zone: " + dtend.TimeZoneName;
+                                    DTEnd.Text = "Ends: " + dtend.Value.Day.ToString("D2") + "." + dtend.Value.Month.ToString("D2") + "." + dtend.Value.Year + " at " + dtend.Value.Hour.ToString("D2") + ":" + dtend.Value.Minute.ToString("D2") + ". Time zone: " + dtend.TimeZoneName;
                                 }
 
                                 //Stop after first event for not. TODO: Declare vars earlier, make them lists, iterate through all, implement Buttons to go through all of them.
